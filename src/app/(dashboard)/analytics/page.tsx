@@ -2,18 +2,21 @@
 
 import React from 'react';
 import { Card, Button } from '@/components/ui';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  Smile, 
-  Frown, 
-  Zap, 
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Smile,
+  Frown,
+  Zap,
   Brain,
   Calendar,
   ChevronDown
 } from 'lucide-react';
-import { 
+
+import { motion } from 'framer-motion';
+
+import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, PieChart, Pie
 } from 'recharts';
