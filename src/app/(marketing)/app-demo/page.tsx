@@ -26,7 +26,7 @@ export default function TrialDumpPage() {
       return;
     }
 
-    // Limit = 5 AI uses
+    // 5-use trial limit
     if (count >= 5) {
       alert('Free trial limit reached. Please login to continue.');
       router.push('/login');
@@ -36,13 +36,11 @@ export default function TrialDumpPage() {
     setLoading(true);
 
     try {
-      // Run AI Engine
       const aiResult = await analyzeThought(text);
 
       if (aiResult) {
         setResult(aiResult);
 
-        // Increase count only after successful AI analysis
         const newCount = count + 1;
         localStorage.setItem('trialCount', newCount.toString());
         setCount(newCount);
@@ -56,25 +54,94 @@ export default function TrialDumpPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto py-12 space-y-8">
+    <div className="max-w-5xl mx-auto py-12 space-y-10">
 
-      {/* Header */}
-      <div className="text-center space-y-3">
+      {/* Heading */}
+      <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">
-          Trial Mind Dump
+          Experience MindDump
         </h1>
 
         <p className="text-foreground/60">
-          Speak your mind — free trial remaining:
+          See how easy it is to declutter your mind in under 60 seconds.
+        </p>
+      </div>
+
+      {/* Demo Video */}
+      <Card className="overflow-hidden border-primary/20 shadow-2xl">
+        <div className="aspect-video">
+          <iframe
+            className="w-full h-full rounded-xl"
+            src="https://www.youtube.com/embed/8jPQjjsBbIc"
+            title="MindDump Demo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+
+        <div className="p-6 text-left">
+          <h3 className="text-xl font-bold">
+            Full Platform Walkthrough
+          </h3>
+
+          <p className="text-foreground/60 text-sm">
+            Watch how MindDump turns messy thoughts into clarity.
+          </p>
+        </div>
+      </Card>
+
+      {/* Steps */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {[
+          {
+            label: 'Step 1',
+            title: 'Dump',
+            desc: 'Speak or type your raw thoughts.',
+          },
+          {
+            label: 'Step 2',
+            title: 'AI Organize',
+            desc: 'MindDump categorizes everything automatically.',
+          },
+          {
+            label: 'Step 3',
+            title: 'Reflect',
+            desc: 'Get clarity, tasks and useful insights.',
+          },
+        ].map((step, i) => (
+          <Card key={i} className="p-6 text-left space-y-2">
+            <span className="text-xs font-bold text-primary uppercase">
+              {step.label}
+            </span>
+
+            <h4 className="font-bold">
+              {step.title}
+            </h4>
+
+            <p className="text-xs text-foreground/40">
+              {step.desc}
+            </p>
+          </Card>
+        ))}
+      </div>
+
+      {/* Trial Header */}
+      <div className="text-center space-y-3">
+        <h2 className="text-3xl font-bold">
+          Try MindDump Free
+        </h2>
+
+        <p className="text-foreground/60">
+          Free Trial Remaining:
           <span className="font-semibold">
-            {' '} {Math.max(0, 5 - count)} / 5
+            {' '}
+            {Math.max(0, 5 - count)} / 5
           </span>
         </p>
       </div>
 
-      {/* Input Card */}
+      {/* Input */}
       <Card className="p-6 space-y-6 border-primary/20 shadow-2xl">
-
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -89,7 +156,6 @@ export default function TrialDumpPage() {
         >
           {loading ? 'AI Thinking...' : 'Process with AI'}
         </Button>
-
       </Card>
 
       {/* AI Results */}
@@ -101,6 +167,7 @@ export default function TrialDumpPage() {
               <h3 className="font-bold text-lg mb-3">
                 Tasks
               </h3>
+
               <ul className="space-y-2">
                 {result.tasks.map((item: string, i: number) => (
                   <li key={i}>• {item}</li>
@@ -114,6 +181,7 @@ export default function TrialDumpPage() {
               <h3 className="font-bold text-lg mb-3">
                 Ideas
               </h3>
+
               <ul className="space-y-2">
                 {result.ideas.map((item: string, i: number) => (
                   <li key={i}>• {item}</li>
@@ -127,6 +195,7 @@ export default function TrialDumpPage() {
               <h3 className="font-bold text-lg mb-3">
                 Worries
               </h3>
+
               <ul className="space-y-2">
                 {result.worries.map((item: string, i: number) => (
                   <li key={i}>• {item}</li>
@@ -140,6 +209,7 @@ export default function TrialDumpPage() {
               <h3 className="font-bold text-lg mb-3">
                 Goals
               </h3>
+
               <ul className="space-y-2">
                 {result.goals.map((item: string, i: number) => (
                   <li key={i}>• {item}</li>
@@ -153,6 +223,7 @@ export default function TrialDumpPage() {
               <h3 className="font-bold text-lg mb-3">
                 Reminders
               </h3>
+
               <ul className="space-y-2">
                 {result.reminders.map((item: string, i: number) => (
                   <li key={i}>• {item}</li>
@@ -163,7 +234,6 @@ export default function TrialDumpPage() {
 
         </div>
       )}
-
     </div>
   );
 }
