@@ -5,18 +5,17 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button, cn } from '@/components/ui';
-import { 
-  LayoutDashboard, 
-  BrainCircuit, 
-  BarChart3, 
-  Journal as JournalIcon, 
-  Settings, 
-  User, 
+import {
+  LayoutDashboard,
+  BrainCircuit,
+  BarChart3,
+  BookOpen,
+  Settings,
+  User,
   LogOut,
   Bell,
   Sparkles,
-  Search,
-  BookOpen
+  Search
 } from 'lucide-react';
 
 const navItems = [
