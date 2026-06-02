@@ -1,5 +1,5 @@
 export const analyzeThought = async (text: string) => {
-  // Simulate network delay
+  // Simulate AI thinking delay
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
   const cleanText = text.trim();
@@ -13,110 +13,138 @@ export const analyzeThought = async (text: string) => {
     reminders: [] as string[],
   };
 
-  // Human-style keyword groups
-  const keywords = {
-    tasks: [
-      'need to',
-      'have to',
-      'must',
-      'finish',
-      'complete',
-      'submit',
-      'call',
-      'send',
-      'fix',
-      'buy',
-      'prepare',
-      'work on',
-      'meeting'
-    ],
+  // Split gently for mixed thoughts / voice transcript
+  const thoughts = cleanText
+    .split(/[.!?\n]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
 
-    ideas: [
-      'idea',
-      'what if',
-      'maybe',
-      'could',
-      'imagine',
-      'thought',
-      'build',
-      'create',
-      'design',
-      'app',
-      'project'
-    ],
-
-    worries: [
-      'worried',
-      'stress',
-      'stressed',
-      'overwhelmed',
-      'fear',
-      'anxious',
-      'scared',
-      'problem',
-      'issue',
-      'nervous',
-      'not sure',
-      'concern'
-    ],
-
-    goals: [
-      'want to',
-      'dream',
-      'goal',
-      'future',
-      'one day',
-      'become',
-      'achieve',
-      'learn',
-      'grow',
-      'improve'
-    ],
-
-    reminders: [
-      "don't forget",
-      'remember',
-      'remind me',
-      'tomorrow',
-      'next week',
-      'schedule',
-      'at',
-      'on'
-    ]
+  // Remove duplicate results
+  const addUnique = (arr: string[], item: string) => {
+    if (item && !arr.includes(item)) {
+      arr.push(item);
+    }
   };
 
-  const lowerText = cleanText.toLowerCase();
+  thoughts.forEach((thought) => {
+    const lower = thought.toLowerCase();
 
-  // Helper function
-  const extractMatches = (list: string[]) =>
-    list.some((keyword) => lowerText.includes(keyword));
+    // ---------- TASKS ----------
+    if (
+      lower.includes('need to') ||
+      lower.includes('have to') ||
+      lower.includes('must') ||
+      lower.includes('finish') ||
+      lower.includes('complete') ||
+      lower.includes('submit') ||
+      lower.includes('call') ||
+      lower.includes('buy') ||
+      lower.includes('send') ||
+      lower.includes('work on')
+    ) {
+      let task = thought
+        .replace(/i need to|need to|have to|must|should|i should/gi, '')
+        .trim();
 
-  // TASKS
-  if (extractMatches(keywords.tasks)) {
-    result.tasks.push(cleanText);
-  }
+      task = task.charAt(0).toUpperCase() + task.slice(1);
 
-  // IDEAS
-  if (extractMatches(keywords.ideas)) {
-    result.ideas.push(cleanText);
-  }
+      addUnique(result.tasks, task);
+    }
 
-  // WORRIES
-  if (extractMatches(keywords.worries)) {
-    result.worries.push(cleanText);
-  }
+    // ---------- IDEAS ----------
+    if (
+      lower.includes('idea') ||
+      lower.includes('what if') ||
+      lower.includes('maybe') ||
+      lower.includes('could') ||
+      lower.includes('imagine') ||
+      lower.includes('create') ||
+      lower.includes('build') ||
+      lower.includes('design') ||
+      lower.includes('app') ||
+      lower.includes('project')
+    ) {
+      let idea = thought
+        .replace(
+          /i had an idea for|idea for|what if|maybe|i was thinking about/gi,
+          ''
+        )
+        .trim();
 
-  // GOALS
-  if (extractMatches(keywords.goals)) {
-    result.goals.push(cleanText);
-  }
+      idea = idea.charAt(0).toUpperCase() + idea.slice(1);
 
-  // REMINDERS
-  if (extractMatches(keywords.reminders)) {
-    result.reminders.push(cleanText);
-  }
+      addUnique(result.ideas, idea);
+    }
 
-  // Smart fallback
+    // ---------- WORRIES ----------
+    if (
+      lower.includes('worried') ||
+      lower.includes('stress') ||
+      lower.includes('stressed') ||
+      lower.includes('overwhelmed') ||
+      lower.includes('fear') ||
+      lower.includes('scared') ||
+      lower.includes('anxious') ||
+      lower.includes('nervous') ||
+      lower.includes('not sure') ||
+      lower.includes('concern')
+    ) {
+      let worry = thought
+        .replace(
+          /i am|i'm|worried|stressed|overwhelmed|anxious|nervous|about/gi,
+          ''
+        )
+        .trim();
+
+      worry = `Concern about ${worry}`;
+
+      addUnique(result.worries, worry);
+    }
+
+    // ---------- GOALS ----------
+    if (
+      lower.includes('want to') ||
+      lower.includes('goal') ||
+      lower.includes('dream') ||
+      lower.includes('future') ||
+      lower.includes('one day') ||
+      lower.includes('become') ||
+      lower.includes('achieve')
+    ) {
+      let goal = thought
+        .replace(
+          /i want to|my goal is to|goal is to|dream to|one day|future/gi,
+          ''
+        )
+        .trim();
+
+      goal = goal.charAt(0).toUpperCase() + goal.slice(1);
+
+      addUnique(result.goals, goal);
+    }
+
+    // ---------- REMINDERS ----------
+    if (
+      lower.includes("don't forget") ||
+      lower.includes('remember') ||
+      lower.includes('remind me') ||
+      lower.includes('tomorrow') ||
+      lower.includes('next week')
+    ) {
+      let reminder = thought
+        .replace(
+          /don't forget to|don't forget|remember to|remember|remind me to/gi,
+          ''
+        )
+        .trim();
+
+      reminder = reminder.charAt(0).toUpperCase() + reminder.slice(1);
+
+      addUnique(result.reminders, reminder);
+    }
+  });
+
+  // ---------- SMART AI FALLBACK ----------
   if (
     !result.tasks.length &&
     !result.ideas.length &&
@@ -125,13 +153,12 @@ export const analyzeThought = async (text: string) => {
     !result.reminders.length
   ) {
     if (
-      lowerText.includes('need') ||
-      lowerText.includes('should') ||
-      lowerText.includes('have to')
+      cleanText.toLowerCase().includes('need') ||
+      cleanText.toLowerCase().includes('should')
     ) {
-      result.tasks.push(cleanText);
+      result.tasks.push('Possible pending task detected');
     } else {
-      result.ideas.push(cleanText);
+      result.ideas.push('General thought or reflection detected');
     }
   }
 
