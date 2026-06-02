@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button } from '@/components/ui';
 import { useRouter } from 'next/navigation';
-import { analyzeThought } from '@/src/lib/ai-engine';
+import { analyzeThought } from '@/lib/ai-engine';
 
 export default function TrialDumpPage() {
   const [text, setText] = useState('');
