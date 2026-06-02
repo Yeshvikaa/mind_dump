@@ -1,12 +1,9 @@
 export const analyzeThought = async (text: string) => {
   // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
   const cleanText = text.trim();
   if (!cleanText) return null;
-
-  // Split by sentences (roughly)
-  const sentences = cleanText.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 3);
 
   const result = {
     tasks: [] as string[],
@@ -16,40 +13,127 @@ export const analyzeThought = async (text: string) => {
     reminders: [] as string[],
   };
 
-  // Keywords for classification
+  // Human-style keyword groups
   const keywords = {
-    tasks: ['do', 'buy', 'call', 'send', 'fix', 'finish', 'complete', 'email', 'start', 'meeting'],
-    ideas: ['maybe', 'could', 'how about', 'idea', 'project', 'thought', 'imagine', 'creative', 'app'],
-    worries: ['worried', 'stress', 'fear', 'anxious', 'problem', 'scared', 'issue', 'not sure', 'nervous'],
-    goals: ['want to', 'achieve', 'become', 'learn', 'grow', 'future', 'dream', 'target', 'habit'],
-    reminders: ['don\'t forget', 'remember', 'at', 'on', 'tomorrow', 'next week', 'reminder', 'schedule'],
+    tasks: [
+      'need to',
+      'have to',
+      'must',
+      'finish',
+      'complete',
+      'submit',
+      'call',
+      'send',
+      'fix',
+      'buy',
+      'prepare',
+      'work on',
+      'meeting'
+    ],
+
+    ideas: [
+      'idea',
+      'what if',
+      'maybe',
+      'could',
+      'imagine',
+      'thought',
+      'build',
+      'create',
+      'design',
+      'app',
+      'project'
+    ],
+
+    worries: [
+      'worried',
+      'stress',
+      'stressed',
+      'overwhelmed',
+      'fear',
+      'anxious',
+      'scared',
+      'problem',
+      'issue',
+      'nervous',
+      'not sure',
+      'concern'
+    ],
+
+    goals: [
+      'want to',
+      'dream',
+      'goal',
+      'future',
+      'one day',
+      'become',
+      'achieve',
+      'learn',
+      'grow',
+      'improve'
+    ],
+
+    reminders: [
+      "don't forget",
+      'remember',
+      'remind me',
+      'tomorrow',
+      'next week',
+      'schedule',
+      'at',
+      'on'
+    ]
   };
 
-  sentences.forEach((sentence) => {
-    const lower = sentence.toLowerCase();
-    
-    // Ignore simple greetings or very short filler
-    if (['hi', 'hello', 'hey', 'thanks', 'ok', 'yes', 'no'].includes(lower)) return;
+  const lowerText = cleanText.toLowerCase();
 
-    if (keywords.tasks.some(k => lower.includes(k))) {
-      result.tasks.push(sentence);
-    } else if (keywords.reminders.some(k => lower.includes(k))) {
-      result.reminders.push(sentence);
-    } else if (keywords.worries.some(k => lower.includes(k))) {
-      result.worries.push(sentence);
-    } else if (keywords.goals.some(k => lower.includes(k))) {
-      result.goals.push(sentence);
-    } else if (keywords.ideas.some(k => lower.includes(k))) {
-      result.ideas.push(sentence);
+  // Helper function
+  const extractMatches = (list: string[]) =>
+    list.some((keyword) => lowerText.includes(keyword));
+
+  // TASKS
+  if (extractMatches(keywords.tasks)) {
+    result.tasks.push(cleanText);
+  }
+
+  // IDEAS
+  if (extractMatches(keywords.ideas)) {
+    result.ideas.push(cleanText);
+  }
+
+  // WORRIES
+  if (extractMatches(keywords.worries)) {
+    result.worries.push(cleanText);
+  }
+
+  // GOALS
+  if (extractMatches(keywords.goals)) {
+    result.goals.push(cleanText);
+  }
+
+  // REMINDERS
+  if (extractMatches(keywords.reminders)) {
+    result.reminders.push(cleanText);
+  }
+
+  // Smart fallback
+  if (
+    !result.tasks.length &&
+    !result.ideas.length &&
+    !result.worries.length &&
+    !result.goals.length &&
+    !result.reminders.length
+  ) {
+    if (
+      lowerText.includes('need') ||
+      lowerText.includes('should') ||
+      lowerText.includes('have to')
+    ) {
+      result.tasks.push(cleanText);
     } else {
-      // Default to tasks if it sounds like an action, otherwise idea
-      if (lower.startsWith('i need to') || lower.startsWith('must')) {
-        result.tasks.push(sentence);
-      } else {
-        result.ideas.push(sentence);
-      }
+      result.ideas.push(cleanText);
     }
-  });
+  }
 
   return result;
 };
